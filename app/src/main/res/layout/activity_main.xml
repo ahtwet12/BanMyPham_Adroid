@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FBF8F8"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:background="#f999b7"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/logotheface" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="635dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="CHÀO MỪNG BẠN ĐẾN VỚI THE FACE COSMETICS"
+                android:textAlignment="center"
+                android:textColor="#F4EFEF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:background="#ffe7f0"
+            android:orientation="horizontal">
+
+            <SearchView
+                android:layout_width="303dp"
+                android:layout_height="match_parent"
+                android:background="#ffe7f0" />
+
+            <ImageView
+                android:id="@+id/Cart"
+                android:layout_width="52dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/baseline_shopping_cart_24" />
+
+            <ImageView
+                android:id="@+id/LoginForm"
+                android:layout_width="49dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/baseline_people_24" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:background="#f999b7"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtDanhMucSP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="10px"
+                android:text="Danh mục sản phẩm"
+                android:textAlignment="center"
+                android:textColor="#FAF7F7"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtSanPhamMoi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="10px"
+                android:text="Sản phẩm mới"
+                android:textAlignment="center"
+                android:textColor="#F2F0F0"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtTheFaceBT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="10px"
+                android:text="The Face Beauty"
+                android:textAlignment="center"
+                android:textColor="#F8F4F4"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="625dp"
+            android:orientation="vertical"
+            android:scrollbars="vertical"></LinearLayout>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
