@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFEBF1">
@@ -142,7 +143,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="39dp"
             android:orientation="horizontal">
 
             <TextView
@@ -155,12 +156,18 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnthemanh"
-                android:layout_width="270dp"
+            <ImageButton
+                android:id="@+id/imgbtnFolder"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Chọn ảnh" />
+                app:srcCompat="@drawable/baseline_create_new_folder_24" />
+
+            <ImageView
+                android:id="@+id/imgHinh"
+                android:layout_width="178dp"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/baseline_image_24" />
 
         </LinearLayout>
 

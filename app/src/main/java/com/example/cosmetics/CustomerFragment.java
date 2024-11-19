@@ -75,7 +75,7 @@ public class CustomerFragment extends Fragment {
         btnadd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String makh = editmakh.getText().toString();
+
                 String hoten = edithoten.getText().toString();
                 String dienthoai = editdienthoai.getText().toString();
                 String diachi = editdiachi.getText().toString();
@@ -87,7 +87,7 @@ public class CustomerFragment extends Fragment {
                 }
 
                 ContentValues myvalue = new ContentValues();
-                myvalue.put("makh",makh);
+
                 myvalue.put("hoten",hoten);
                 myvalue.put("dienthoai",dienthoai);
                 myvalue.put("diachi",diachi);
@@ -109,6 +109,12 @@ public class CustomerFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String makh = editmakh.getText().toString();
+
+                if (makh.isEmpty() || !makh.matches("\\d+")) { // Kiểm tra makh là số
+                    Toast.makeText(getActivity(), "Mã khách hàng không hợp lệ!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 int n = mydatabase.delete("tblcustomer","makh = ?", new String[]{makh});
                 String msg = "";
                 if(n == 0){
@@ -129,6 +135,12 @@ public class CustomerFragment extends Fragment {
                 String diachi = editdiachi.getText().toString();
                 String email = editemail.getText().toString();
                 String makh = editmakh.getText().toString();
+
+                if (makh.isEmpty() || !makh.matches("\\d+")) { // Kiểm tra makh là số
+                    Toast.makeText(getActivity(), "Mã khách hàng không hợp lệ!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
 
                 ContentValues myvalue = new ContentValues();
                 myvalue.put("hoten",hoten);
