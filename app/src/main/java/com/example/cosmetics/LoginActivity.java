@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,7 +40,19 @@ public class LoginActivity extends AppCompatActivity {
         btnDangNhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String username = editUser.getText().toString().trim();
+                String password = editPass.getText().toString().trim();
 
+                // Kiểm tra thông tin đăng nhập
+                if (username.equals("admin") && password.equals("123123")) {
+                    // Chuyển hướng đến AdminActivity
+                    Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                    startActivity(intent);
+                    finish(); // Kết thúc LoginActivity
+                } else {
+                    // Thông báo sai thông tin đăng nhập
+                    Toast.makeText(LoginActivity.this, "Tài khoản hoặc mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
