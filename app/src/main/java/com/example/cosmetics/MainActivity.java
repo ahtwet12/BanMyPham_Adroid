@@ -1,184 +1,169 @@
 package com.example.cosmetics;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.view.MenuItem;
-import androidx.appcompat.app.AlertDialog;
-import android.content.DialogInterface;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView txtDanhMucSP, txtSanPhamMoi, txtTheFaceBT;
-    ImageView LoginForm , Cart;
+    ImageView LoginForm, Cart;
+    ListView lv_show;
+    private ArrayList<String> productList;
+    private ArrayAdapter<String> productAdapter;
 
-    private static final int MENU_ITEM_1 = 1;
-    private static final int MENU_ITEM_2 = 2;
-    private static final int MENU_ITEM_3 = 3;
-    private static final int MENU_ITEM_4 = 4;
-
-    private static final int MENU_NEW_1 = 1;
-    private static final int MENU_NEW_2 = 2;
-    private static final int MENU_NEW_3 = 3;
-    private static final int MENU_NEW_4 = 4;
+    SQLiteDatabase mydatabase; // Cơ sở dữ liệu
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-    //anh xa bien
-        txtDanhMucSP = (TextView) findViewById(R.id.txtDanhMucSP);
-        txtDanhMucSP.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPopupMenu(view);
-            }
-        });
-        txtSanPhamMoi = (TextView) findViewById(R.id.txtSanPhamMoi);
 
-        txtTheFaceBT = (TextView) findViewById(R.id.txtTheFaceBT);
-        txtTheFaceBT.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showTheFaceMenu(view);
-            }
-        });
+        // Ánh xạ biến
+        lv_show = findViewById(R.id.lv_show);
+        txtDanhMucSP = findViewById(R.id.txtDanhMucSP);
+        txtDanhMucSP.setOnClickListener(view -> showPopupMenu(view));
+
+        txtSanPhamMoi = findViewById(R.id.txtSanPhamMoi);
+        txtTheFaceBT = findViewById(R.id.txtTheFaceBT);
+        txtTheFaceBT.setOnClickListener(view -> showTheFaceMenu(view));
+
         LoginForm = findViewById(R.id.LoginForm);
-        LoginForm.setClickable(true);  // Đảm bảo LoginForm có thể nhấn
-
-
         Cart = findViewById(R.id.Cart);
-        Cart.setClickable(true);  // Đảm bảo LoginForm có thể nhấn
 
-        //thao tasc sang form đang nhap
-        LoginForm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
+        // Sự kiện chuyển sang form đăng nhập
+        LoginForm.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
         });
 
-        //thao tasc sang form cart
-        Cart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, CartActivity.class);
-                startActivity(intent);
-            }
+        // Sự kiện chuyển sang form giỏ hàng
+        Cart.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, CartActivity.class);
+            startActivity(intent);
         });
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        // Khởi tạo danh sách và adapter cho ListView
+        productList = new ArrayList<>();
+        productAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, productList);
+        lv_show.setAdapter(productAdapter);
+
+        // Mở hoặc tạo cơ sở dữ liệu
+        mydatabase = openOrCreateDatabase("mypham.db", MODE_PRIVATE, null);
+
+        // Tạo bảng nếu chưa tồn tại
+        mydatabase.execSQL("CREATE TABLE IF NOT EXISTS tblproduct (" +
+                "masp TEXT PRIMARY KEY, " +
+                "tensp TEXT, " +
+                "mota TEXT, " +
+                "dongia INTEGER, " +
+                "soluong INTEGER)");
+
+        // Hiển thị dữ liệu từ cơ sở dữ liệu
+        loadProductData();
+
+        // Bắt sự kiện click vào item trong ListView
+        lv_show.setOnItemClickListener((parent, view, position, id) -> {
+            // Lấy thông tin sản phẩm từ danh sách
+            String productInfo = productList.get(position);
+            String[] productDetails = productInfo.split(" - ");
+            String name = productDetails[0]; // Tên sản phẩm
+            String description = productDetails[1]; // Mô tả sản phẩm
+            int price = Integer.parseInt(productDetails[2].replace("đ", "").trim()); // Giá sản phẩm
+
+            // Tạo đối tượng Product
+            Product selectedProduct = new Product(name, description, price);
+
+            // Chuyển dữ liệu sản phẩm qua Intent sang CartActivity
+            Intent intent = new Intent(MainActivity.this, CartActivity.class);
+            intent.putExtra("product", selectedProduct); // Truyền sản phẩm qua Intent
+            startActivity(intent);
+
+            // Hiển thị thông báo sản phẩm đã được thêm vào giỏ hàng
+            Toast.makeText(MainActivity.this, "Sản phẩm đã được thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
         });
     }
-    //hiển thị danh mục sản phẩm
+
+    // Hàm hiển thị danh mục sản phẩm
     private void showPopupMenu(View view) {
         PopupMenu popup = new PopupMenu(this, view);
+        popup.getMenu().add(0, 1, 0, "Chăm Sóc Da Mặt");
+        popup.getMenu().add(0, 2, 1, "Chăm Sóc Cơ Thể");
+        popup.getMenu().add(0, 3, 2, "Trang Điểm");
+        popup.getMenu().add(0, 4, 3, "Phụ Kiện Làm Đẹp");
 
-        // Thêm các mục vào menu con trực tiếp
-        popup.getMenu().add(0, MENU_ITEM_1, 0, "Chăm Sóc Da Mặt");
-        popup.getMenu().add(0, MENU_ITEM_2, 1, "Chăm Sóc Cơ Thể");
-        popup.getMenu().add(0, MENU_ITEM_3, 2, "Trang Điểm");
-        popup.getMenu().add(0, MENU_ITEM_4, 3, "Phụ Kiện Làm Đẹp");
-
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case MENU_ITEM_1:
-                        // Xử lý khi nhấn vào Mục 1
-                        // Ví dụ: hiển thị thông báo
-
-                        return true;
-                    case MENU_ITEM_2:
-                        // Xử lý khi nhấn vào Mục 2
-
-                        return true;
-                    case MENU_ITEM_3:
-                        // Xử lý khi nhấn vào Mục 3
-
-                    case MENU_ITEM_4:
-                        // Xử lý khi nhấn vào Mục 4
-
-                        return true;
-                    default:
-                        return false;
-                }
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 1: // Chăm Sóc Da Mặt
+                case 2: // Chăm Sóc Cơ Thể
+                case 3: // Trang Điểm
+                case 4: // Phụ Kiện Làm Đẹp
+                    Toast.makeText(MainActivity.this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+                    return true;
+                default:
+                    return false;
             }
         });
 
         popup.show();
     }
-    //hiển thị the face beauty
+
+    // Hàm hiển thị menu sản phẩm The Face
     private void showTheFaceMenu(View view) {
         PopupMenu popup = new PopupMenu(this, view);
+        popup.getMenu().add(0, 1, 0, "Chăm Sóc Da Mặt");
+        popup.getMenu().add(0, 2, 1, "Chăm Sóc Cơ Thể");
+        popup.getMenu().add(0, 3, 2, "Trang Điểm");
+        popup.getMenu().add(0, 4, 3, "Phụ Kiện Làm Đẹp");
 
-        // Thêm các mục vào menu con trực tiếp
-        popup.getMenu().add(0, MENU_NEW_1, 0, "Chăm Sóc Da Mặt");
-        popup.getMenu().add(0, MENU_NEW_2, 1, "Chăm Sóc Cơ Thể");
-        popup.getMenu().add(0, MENU_NEW_3, 2, "Trang Điểm");
-        popup.getMenu().add(0, MENU_NEW_4, 3, "Phụ Kiện Làm Đẹp");
-
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case MENU_NEW_1:
-                        // Xử lý khi nhấn vào Mục 1
-                        showProductList("Chăm Sóc Da Mặt", new String[]{"Nước tẩy trang", "Sữa rửa mặt", "Toner","Xịt khoáng","Mặt nạ","Chống Nắng"});
-
-                        return true;
-                    case MENU_NEW_2:
-                        // Xử lý khi nhấn vào Mục 2
-                        showProductList("Chăm Sóc Cơ Thể", new String[]{"Tẩy tế bào chết", "Sữa tắm", "Dầu gội - Dầu xả", "Dưỡng mi","Nước hoa","Lotion body"});
-                        return true;
-                    case MENU_NEW_3:
-                        // Xử lý khi nhấn vào Mục 3
-                        showProductList("Trang Điểm", new String[]{"Son", "Phấn má", "Phấn mắt", "Kem lót", "Kem nền","Che khuyết điểm","Kẻ mày", "Masscara", "Phấn phủ"});
-                    case MENU_NEW_4:
-                        // Xử lý khi nhấn vào Mục 4
-                        showProductList("Phụ Kiện Làm Đẹp", new String[]{"Cọ trang điểm", "Bông tẩy trang", "Gương", "Kẹp tóc" , "Chun buộc tóc", "Bông mút"});
-                        return true;
-                    default:
-                        return false;
-                }
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    Toast.makeText(MainActivity.this, "Chức năng đang được phát triển", Toast.LENGTH_SHORT).show();
+                    return true;
+                default:
+                    return false;
             }
         });
 
         popup.show();
     }
-    // Hiển thị danh sách sản phẩm dưới dạng AlertDialog
-    private void showProductList(String title, String[] products) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title);
 
-        // Thêm danh sách sản phẩm vào dialog
-        builder.setItems(products, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Xử lý khi người dùng chọn một sản phẩm từ danh sách
-                String selectedProduct = products[which];
-                Toast.makeText(getApplicationContext(), "Bạn đã chọn: " + selectedProduct, Toast.LENGTH_SHORT).show();
-            }
-        });
+    // Hàm load dữ liệu từ cơ sở dữ liệu
+    private void loadProductData() {
+        productList.clear(); // Xóa danh sách cũ
 
-        // Hiển thị dialog
-        builder.show();
+        Cursor cursor = mydatabase.rawQuery("SELECT * FROM tblproduct", null);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                String tensp = cursor.getString(1); // Tên sản phẩm
+                String mota = cursor.getString(2); // Mô tả sản phẩm
+                int dongia = cursor.getInt(3); // Giá sản phẩm
+
+                // Định dạng dữ liệu hiển thị
+                String product = tensp + " - " + mota + " - " + dongia + "đ";
+                productList.add(product);
+            } while (cursor.moveToNext());
+        } else {
+            Toast.makeText(this, "Không có sản phẩm nào trong cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
+        }
+
+        if (cursor != null) cursor.close();
+        productAdapter.notifyDataSetChanged(); // Cập nhật ListView
     }
-
-
 }

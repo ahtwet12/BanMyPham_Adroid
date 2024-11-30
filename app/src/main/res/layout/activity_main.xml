@@ -114,7 +114,13 @@
             android:layout_width="match_parent"
             android:layout_height="625dp"
             android:orientation="vertical"
-            android:scrollbars="vertical"></LinearLayout>
+            android:scrollbars="vertical">
+
+            <ListView
+                android:id="@+id/lv_show"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
